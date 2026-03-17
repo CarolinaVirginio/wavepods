@@ -2,12 +2,9 @@ import express from "express";
 import cors from "cors";
 import Stripe from "stripe";
 import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
 import emailRoutes from "./routes/emailRoutes.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import newsletterRoutes from "./routes/newsletterRoutes.js";
+import { fail } from "./utils/httpResponses.js";
 
 dotenv.config();
 
@@ -25,16 +22,20 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
+    origin(origin, callback) {
+      if (!origin) {
+        return callback(null, true);
+      }
+
       const isLocalhost =
         origin.startsWith("http://localhost") ||
         origin.startsWith("http://127.0.0.1");
+
       if (allowedOrigins.includes(origin) || isLocalhost) {
-        callback(null, true);
-      } else {
-        callback(new Error("Erro de CORS: Acesso não permitido"));
+        return callback(null, true);
       }
+
+      return callback(new Error("CORS bloqueado para esta origem."));
     },
     credentials: true,
   }),
@@ -42,10 +43,13 @@ app.use(
 
 app.use(express.json());
 app.use("/api", emailRoutes);
+app.use("/api", newsletterRoutes);
 
 app.post("/api/create-checkout-session", async (req, res) => {
   if (!stripe || !STRIPE_PRICE_ID) {
-    return res.status(500).json({ error: "Stripe não configurado." });
+    return fail(res, 500, "Stripe não configurado.", {
+      code: "STRIPE_NOT_CONFIGURED",
+    });
   }
 
   try {
@@ -58,28 +62,50 @@ app.post("/api/create-checkout-session", async (req, res) => {
       line_items: [
         { price: STRIPE_PRICE_ID, quantity: req.body.quantity || 1 },
       ],
-
       success_url: `${requestOrigin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${requestOrigin}/canceled`,
     });
 
-    res.json({ url: session.url });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.json({ ok: true, data: { url: session.url } });
+  } catch (error) {
+    return fail(res, 500, error.message, { code: "CHECKOUT_SESSION_ERROR" });
   }
 });
 
 app.get("/api/checkout-session", async (req, res) => {
-  if (!stripe)
-    return res.status(500).json({ error: "Stripe não configurado." });
+  if (!stripe) {
+    return fail(res, 500, "Stripe não configurado.", {
+      code: "STRIPE_NOT_CONFIGURED",
+    });
+  }
+
   try {
     const session = await stripe.checkout.sessions.retrieve(
       req.query.session_id,
     );
-    res.json(session);
+
+    return res.json({ ok: true, data: session });
   } catch {
-    res.status(404).json({ error: "Sessão não encontrada." });
+    return fail(res, 404, "Sessão não encontrada.", {
+      code: "CHECKOUT_SESSION_NOT_FOUND",
+    });
   }
+});
+
+app.use((req, res) => {
+  return fail(res, 404, "Rota não encontrada.", { code: "ROUTE_NOT_FOUND" });
+});
+
+app.use((error, req, res, next) => {
+  console.error(error);
+
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  return fail(res, 500, "Erro interno do servidor.", {
+    code: "INTERNAL_SERVER_ERROR",
+  });
 });
 
 const port = PORT || 4242;
