@@ -70,7 +70,9 @@ const Header = () => {
           ))}
         </nav>
 
-        <CustomButton onClick={createCheckoutSession}>Comprar</CustomButton>
+        <CustomButton onClick={() => createCheckoutSession()}>
+          Comprar
+        </CustomButton>
       </Toolbar>
     </AppBar>
   );

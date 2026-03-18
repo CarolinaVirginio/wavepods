@@ -93,7 +93,7 @@ const ContentMain = () => {
               flexWrap: "wrap",
             }}
           >
-            <CustomButton onClick={createCheckoutSession}>
+            <CustomButton onClick={() => createCheckoutSession()}>
               Comprar agora
             </CustomButton>
 

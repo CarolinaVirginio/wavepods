@@ -35,7 +35,9 @@ function BuySection() {
           Pronto para transformar sua experiência musical?
         </Typography>
 
-        <CustomButton onClick={createCheckoutSession}>Comprar</CustomButton>
+        <CustomButton onClick={() => createCheckoutSession()}>
+          Comprar
+        </CustomButton>
       </Container>
     </Box>
   );
