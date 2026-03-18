@@ -1,209 +1,153 @@
-# WavePods — Fullstack Landing Page
+# WavePods
 
-WavePods is a professional-level project developed to practice modern fullstack development. It features a fully customized interface, a robust Node.js backend, and a secure payment flow integrated with Stripe.
+WavePods is a full stack project built with React and Node.js that started as a landing page and is now evolving into a complete application. At this stage, it already includes a React/Vite frontend, an Express backend, Stripe checkout integration, and local persistence for newsletter subscriptions.
 
-- Frontend: Built with React + Vite & Material UI.
-- Backend: Node.js + Express with modular architecture.
-- Infrastructure: Fully containerized using Docker & Nginx.
-- Payments: Secure integration with Stripe Checkout.
-- Validation: Custom email validation on the server side and security headers.
+## Overview
 
-## Features
+- Frontend: React, Vite, Material UI, and React Router
+- Backend: Node.js, Express, and Stripe
+- Infrastructure: Docker, Docker Compose, and Nginx
+- Current stage: a functional product landing page with purchase flow and a solid foundation for future product evolution
 
-- Responsive Design: Smooth experience across mobile, tablet, and desktop devices.
-- Clean Architecture: Clear separation of responsibilities between routes, controllers, and utilities.
-- Email Validation: Custom Regex-based validation in the backend for lead capture.
-- Security: Dynamic CORS policy to support multiple environments (Dev/Prod).
-- Dockerized: Single-command setup for both frontend and backend.
+## Current Features
 
-## Quality Assurance & Testing
-
-To ensure reliability and professional standards, the backend is covered by a comprehensive test suite using **Vitest** and **Supertest**:
-
-- **Unit Testing:** 100% coverage on core business logic, such as the custom email validation utility.
-- **Integration Testing:** Validation of API endpoints to ensure correct HTTP status codes (200, 422) and JSON responses.
-- **Stripe Mocking:** Implementation of advanced mocking techniques to simulate Stripe API responses, allowing safe and fast testing of checkout flows without external dependencies or additional costs.
-
-To run the tests, navigate to the server directory:
-
-```
-cd server
-npm test
-```
-
-To view the coverage report:
-
-```
-npm run coverage
-```
+- Responsive landing page with product presentation sections
+- Stripe Checkout integration
+- Success and canceled purchase pages
+- Newsletter subscription with local JSON persistence
+- Basic `login` and `signup` routes as placeholders for the next phase
 
 ## Project Structure
 
+```text
+wavepods/
+|-- client/
+|   |-- public/
+|   |-- src/
+|   |   |-- api/
+|   |   `-- components/
+|   |-- Dockerfile
+|   `-- vite.config.js
+|-- server/
+|   |-- controllers/
+|   |-- data/
+|   |-- routes/
+|   |-- tests/
+|   |-- utils/
+|   |-- Dockerfile
+|   `-- index.js
+|-- docker-compose.yml
+|-- package.json
+`-- README.md
 ```
-landing_wavepods/
-├── client/                 # React + Vite frontend
-│   ├── src/
-│   │   ├── api/            # API service layer
-│   │   └── components/     # Modular UI components
-│   └── nginx.conf          # Nginx production configuration
-│
-├── server/                 # Node.js + Express backend
-│   ├── routes/             # Modular API routes
-│    ├── controllers/        # Request handlers
-│    ├── tests/              # Vitest & Supertest suite (Unit & Integration)
-│   ├── utils/              # Helper functions (validation, etc.)
-│   ├── index.js            # Main server entry point
-│   └── .env.production     # Production variables (git ignored)
-│
-├── docker-compose.yml      # Full stack orchestration
-└── package.json            # Scripts for Dev/Prod environments
+
+## Running with Docker
+
+This is the easiest way to test the project in an environment closer to production.
+
+### 1. Configure the backend environment variables
+
+Fill in `server/.env.production` with your own values:
+
+```env
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PRICE_ID=price_...
+FRONTEND_URL=http://localhost:8080
+PORT=4242
 ```
 
-## Technologies
+### 2. Start the containers
 
-**Frontend**
-
-- React (Vite)
-- React Router DOM
-- Material UI
-- Framer Motion (optional)
-
-**Backend**
-
-- Node.js + Express
-- Stripe API / Stripe Node SDK
-- Vitest & Supertest (Testing)
-- dotenv
-- CORS
-
-**Infrastructure (Ops)**
-
-- Docker
-- Docker Compose
-- Nginx
-
-## Environment Variables
-
-To run this project, you’ll need a .env file (local development) and a .env.production file (Docker).
-
-**Local Development (server/.env)**
-
+```bash
+docker compose up --build
 ```
+
+### 3. Access the application
+
+- Frontend: `http://localhost:8080`
+- Backend: `http://localhost:4242`
+
+## Running Locally
+
+### 1. Install dependencies
+
+At the root:
+
+```bash
+npm install
+```
+
+In the frontend:
+
+```bash
+cd client
+npm install
+```
+
+In the backend:
+
+```bash
+cd ../server
+npm install
+```
+
+### 2. Configure the `.env` file
+
+Create `server/.env` based on `server/.env.example`:
+
+```env
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_PRICE_ID=price_...
 FRONTEND_URL=http://localhost:5173
 PORT=4242
 ```
 
-**Docker Production (server/.env.production)**
+### 3. Go back to the root and start the project
 
-```
-STRIPE_SECRET_KEY=
-STRIPE_PRICE_ID=
-FRONTEND_URL=http://localhost:8080
-PORT=4242
-```
-
-## Running the Project
-
-### Option 1 — Docker (Recommended)
-
-```
-docker-compose up --build
-```
-
-Access the application at: http://localhost:8080
-
-This command:
-
-- Builds the frontend (React + Vite)
-- Builds the backend (Node + Express)
-- Starts Nginx serving the frontend
-- Proxies /api/\* requests to the backend
-
-**URLs**
-
-- Frontend: http://localhost:8080
-- Backend (via proxy): http://localhost:8080/api
-- Direct backend access: http://localhost:4242
-
-To stop the containers: CTRL + C or docker-compose down
-
-## Option 2 — Local Dev Mode
-
-1. Clone the repository
-
-```
-git clone https://github.com/CarolinaVirginio/landing_wavepods.git
-cd landing_wavepods
-```
-
-2. Install dependencies in both folders.
-
-**Client**
-
-```
-cd client
-npm install
-```
-
-**Server**
-
-```
-cd server
-npm install
-```
-
-3. Create your environment variables:
-
-Inside /server, create a .env file:
-
-```
-STRIPE_SECRET_KEY=
-STRIPE_PRICE_ID=
-FRONTEND_URL=http://localhost:5173
-PORT=4242
-```
-
-4. Run from the root folder:
-
-```
+```bash
 cd ..
 npm run dev
 ```
 
-Access the application at: http://localhost:5173
+### 4. Local URLs
 
-This command:
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:4242`
 
-- Starts the backend using nodemon
-- Starts the frontend with Vite
-- Keeps both running simultaneously using concurrently
+## Environment Variables
 
-**URLs:**
+The variables below are required for the checkout flow to work correctly:
 
-Frontend: http://localhost:5173
+- `STRIPE_SECRET_KEY`: Stripe secret key in test or production mode
+- `STRIPE_PRICE_ID`: price identifier created in the Stripe Dashboard
+- `FRONTEND_URL`: frontend URL allowed by the backend
+- `PORT`: port where the Express server will run
 
-Backend: http://localhost:4242
+Without valid `STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID` values, the buy button will not be able to create a checkout session.
+
+## Newsletter Persistence
+
+Newsletter subscriptions are currently stored in:
+
+`server/data/newsletter-subscribers.json`
+
+This is a transitional persistence layer. The next recommended step is migrating this data to a real database.
 
 ## Screenshots
 
-**(Click to enlarge)**
-
 [![Main](./client/public/contentmain.jpeg)](./client/public/contentmain.jpeg)
 [![Features](./client/public/features.jpeg)](./client/public/features.jpeg)
-[![Motivation1](./client/public/motivation1.jpeg)](./client/public/motivation1.jpeg)
-[![Motivation2](./client/public/motivation2.jpeg)](./client/public/motivation2.jpeg)
-[![Motivation3](./client/public/motivation3.jpeg)](./client/public/motivation3.jpeg)
-[![Buy](./client/public/buysection-footer.jpeg)](./client/public/buysection-footer.jpeg)
+[![Motivation 1](./client/public/motivation1.jpeg)](./client/public/motivation1.jpeg)
+[![Motivation 2](./client/public/motivation2.jpeg)](./client/public/motivation2.jpeg)
+[![Motivation 3](./client/public/motivation3.jpeg)](./client/public/motivation3.jpeg)
+[![Buy Section](./client/public/buysection-footer.jpeg)](./client/public/buysection-footer.jpeg)
 
-## Author
+## Current Status and Next Steps
 
-**Carolina Virginio**
+The project already delivers a functional full stack foundation, but it is not yet a complete application. The most important next steps are:
 
-Developed as part of my frontend portfolio and fullstack learning journey.
-
-## License
-
-© 2025 Carolina Virginio. All rights reserved.
-This project is proprietary and may not be copied or used without permission.
+1. Implement real authentication for `login` and `signup`
+2. Add a database for users, orders, and newsletter data
+3. Build catalog, cart, and customer area flows
+4. Replace client-side payment confirmation with Stripe webhooks
+5. Add CI, frontend tests, and end-to-end coverage
