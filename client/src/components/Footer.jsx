@@ -1,6 +1,7 @@
 import { Box, Container, Typography, TextField } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import CustomButton from "./CustomButton";
+import { createNewsletterSubscription } from "../api/newsletter";
 
 const quickLinks = ["Sobre nós", "Suporte", "Política de privacidade"];
 const socialLinks = ["Instagram", "Facebook", "Twitter"];
@@ -36,35 +37,34 @@ const FooterColumn = ({ title, items }) => (
 const Footer = () => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!status) return;
-    const timer = setTimeout(() => setStatus(""), 3000);
+    const timer = setTimeout(() => {
+      setStatus("");
+      setMessage("");
+    }, 4000);
     return () => clearTimeout(timer);
   }, [status]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     if (!email) return;
 
     try {
-      const res = await fetch("/api/validate-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await res.json();
-
-      if (data.valid) {
-        setStatus("sucesso");
-        setEmail("");
-      } else {
-        setStatus("erro");
-      }
+      setIsSubmitting(true);
+      const response = await createNewsletterSubscription(email);
+      setStatus("sucesso");
+      setMessage(response.message);
+      setEmail("");
     } catch (error) {
-      console.error("Erro ao validar e-mail:", error);
+      console.error("Erro ao salvar e-mail:", error);
       setStatus("erro");
+      setMessage(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -89,7 +89,7 @@ const Footer = () => {
                 color: "#e4dede",
               }}
             >
-              Assine nossa Newsletter
+              Assine nossa newsletter
             </Typography>
             <Typography variant="body2" sx={{ mb: 2, color: "#bfb8b8" }}>
               Fique por dentro das novidades e ofertas exclusivas.
@@ -107,11 +107,11 @@ const Footer = () => {
               }}
             >
               <TextField
-                type="text"
+                type="email"
                 placeholder="Digite seu e-mail"
                 size="small"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(event) => setEmail(event.target.value)}
                 sx={{
                   flex: 1,
                   width: { xs: "100%", sm: 360 },
@@ -124,8 +124,12 @@ const Footer = () => {
                 required
               />
 
-              <CustomButton version="newsletter" type="submit">
-                Inscrever-se
+              <CustomButton
+                version="newsletter"
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Enviando..." : "Inscrever-se"}
               </CustomButton>
             </Box>
 
@@ -137,9 +141,7 @@ const Footer = () => {
                   color: status === "sucesso" ? "#00c6ff" : "#ff4d4f",
                 }}
               >
-                {status === "sucesso"
-                  ? "E-mail inscrito com sucesso!"
-                  : "E-mail inválido"}
+                {message}
               </Typography>
             )}
           </Box>
@@ -155,7 +157,8 @@ const Footer = () => {
 
         <Box sx={{ textAlign: "center", mt: 6, color: "#777" }}>
           <Typography variant="body2">
-            © {new Date().getFullYear()} WavePods. Todos os direitos reservados.
+            Copyright {new Date().getFullYear()} WavePods. Todos os direitos
+            reservados.
           </Typography>
         </Box>
       </Container>

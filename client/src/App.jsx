@@ -8,6 +8,7 @@ import BuySection from "./components/BuySection";
 import Footer from "./components/Footer";
 import Success from "./components/Success";
 import Canceled from "./components/Canceled";
+import AuthPage from "./components/AuthPage";
 
 function Home() {
   return (
@@ -27,6 +28,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<AuthPage mode="login" />} />
+        <Route path="/cadastro" element={<AuthPage mode="register" />} />
         <Route path="/success" element={<Success />} />
         <Route path="/canceled" element={<Canceled />} />
       </Routes>

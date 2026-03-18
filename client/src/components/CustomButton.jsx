@@ -60,15 +60,7 @@ const CustomButton = ({
   const sx = { ...variants[version], ...(sxFromProps || {}) };
 
   return (
-    <Button
-      sx={sx}
-      {...props}
-      onClick={() => {
-        if (typeof handleClick === "function") {
-          handleClick();
-        }
-      }}
-    >
+    <Button sx={sx} {...props} onClick={handleClick}>
       {children}
     </Button>
   );

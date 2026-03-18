@@ -3,6 +3,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { Headphones } from "lucide-react";
+import { Link as RouterLink } from "react-router-dom";
 import CustomButton from "./CustomButton";
 import createCheckoutSession from "../api/checkout";
 
@@ -10,6 +11,7 @@ const links = [
   { label: "Login", href: "/login" },
   { label: "Cadastro", href: "/cadastro" },
 ];
+
 const Header = () => {
   return (
     <AppBar
@@ -49,14 +51,15 @@ const Header = () => {
           {links.map((item) => (
             <Box
               key={item.label}
-              component="a"
-              href={item.href}
+              component={RouterLink}
+              to={item.href}
               sx={{
                 color: "#fff",
                 mr: 3,
                 fontWeight: 500,
                 letterSpacing: "0.05rem",
                 transition: "color 0.3s",
+                textDecoration: "none",
                 "&:hover": {
                   color: "#00bfff",
                 },

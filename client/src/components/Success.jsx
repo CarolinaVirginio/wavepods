@@ -26,7 +26,7 @@ function Success() {
 
       try {
         const res = await fetch(
-          `/api/checkout-session?session_id=${sessionId}`
+          `/api/checkout-session?session_id=${sessionId}`,
         );
 
         if (!res.ok) {
@@ -34,7 +34,8 @@ function Success() {
           return;
         }
 
-        const data = await res.json();
+        const payload = await res.json();
+        const data = payload.data;
 
         if (data.payment_status === "paid") {
           setStatus("Pagamento aprovado! Obrigado pela compra.");

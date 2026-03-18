@@ -8,11 +8,16 @@ async function createCheckoutSession(quantity = 1) {
       body: JSON.stringify({ quantity }),
     });
 
-    if (!res.ok) throw new Error(`Erro ao criar sessão (${res.status})`);
+    if (!res.ok) {
+      throw new Error(`Erro ao criar sessão (${res.status})`);
+    }
 
-    const { url } = await res.json();
+    const payload = await res.json();
+    const url = payload.data?.url;
 
-    if (!url) throw new Error("URL de sessão não recebida.");
+    if (!url) {
+      throw new Error("URL de sessão não recebida.");
+    }
 
     window.location.href = url;
     return { success: true };
