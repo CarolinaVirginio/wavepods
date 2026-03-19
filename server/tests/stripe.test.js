@@ -21,13 +21,14 @@ vi.mock("stripe", () => {
   };
 });
 
-describe("Testes de Integraçãbo: Checkout Stripe", () => {
-  it("deve retornar status 200 e a URL do checkout", async () => {
+describe("POST /api/create-checkout-session", () => {
+  it("Retorna a URL do checkout", async () => {
     const response = await request(app)
       .post("/api/create-checkout-session")
       .send({ quantity: 1 });
 
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty("url", "http://stripe-mock-url.com");
+    expect(response.body.ok).toBe(true);
+    expect(response.body.data.url).toBe("http://stripe-mock-url.com");
   });
 });
