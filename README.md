@@ -7,6 +7,7 @@ WavePods is a full stack project built with React and Node.js that started as a 
 - Frontend: React, Vite, Material UI, and React Router
 - Backend: Node.js, Express, and Stripe
 - Infrastructure: Docker, Docker Compose, and Nginx
+- Recommended Node version for local development and CI: Node 20
 - Current stage: a functional product landing page with purchase flow and a solid foundation for future product evolution
 
 ## Current Features
