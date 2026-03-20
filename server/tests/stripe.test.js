@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import request from "supertest";
-import { app } from "../index.js";
+
+process.env.STRIPE_SECRET_KEY = "sk_test_fake";
+process.env.STRIPE_PRICE_ID = "price_fake";
 
 vi.mock("stripe", () => {
   const StripeMock = function () {
@@ -23,6 +25,8 @@ vi.mock("stripe", () => {
 
 describe("POST /api/create-checkout-session", () => {
   it("Retorna a URL do checkout", async () => {
+    vi.resetModules();
+    const { app } = await import("../index.js");
     const response = await request(app)
       .post("/api/create-checkout-session")
       .send({ quantity: 1 });

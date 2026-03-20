@@ -10,6 +10,7 @@ vi.mock("../utils/newsletterStore.js", () => ({
 describe("POST /api/newsletter-subscriptions", () => {
   beforeEach(() => {
     saveSubscriberMock.mockReset();
+    vi.resetModules();
   });
 
   it("Retorna 201 quando cria uma nova inscrição", async () => {
