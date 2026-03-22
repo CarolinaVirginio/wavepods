@@ -30,7 +30,7 @@ const copyByMode = {
     eyebrow: "Área do cliente",
     title: "Entre na sua conta",
     description:
-      "Esta página prepara o fluxo de autenticação que vamos conectar ao backend na proxima fase.",
+      "Acesse sua conta para continuar acompanhando as novidades da WavePods.",
     primaryAction: "Entrar",
     alternateText: "Ainda não tem conta?",
     alternateLink: "/cadastro",
@@ -40,9 +40,9 @@ const copyByMode = {
     eyebrow: "Comece agora",
     title: "Crie sua conta",
     description:
-      "Esta tela substitui a rota quebrada e deixa o projeto pronto para evoluir para autenticação real.",
+      "Crie sua conta para acompanhar as novidades e os próximos recursos da WavePods.",
     primaryAction: "Criar conta",
-    alternateText: "Ja tem conta?",
+    alternateText: "Já tem conta?",
     alternateLink: "/login",
     alternateLabel: "Fazer login",
   },
