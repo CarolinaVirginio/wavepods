@@ -1,11 +1,20 @@
 import Stripe from "stripe";
 import { fail } from "../utils/httpResponses.js";
 
-const { STRIPE_SECRET_KEY, STRIPE_PRICE_ID, FRONTEND_URL } = process.env;
-const stripe = STRIPE_SECRET_KEY ? new Stripe(STRIPE_SECRET_KEY) : null;
+function getStripeConfig() {
+  const { STRIPE_SECRET_KEY, STRIPE_PRICE_ID, FRONTEND_URL } = process.env;
+
+  return {
+    stripe: STRIPE_SECRET_KEY ? new Stripe(STRIPE_SECRET_KEY) : null,
+    stripePriceId: STRIPE_PRICE_ID,
+    frontendUrl: FRONTEND_URL,
+  };
+}
 
 export const createCheckoutSessionController = async (req, res) => {
-  if (!stripe || !STRIPE_PRICE_ID) {
+  const { stripe, stripePriceId, frontendUrl } = getStripeConfig();
+
+  if (!stripe || !stripePriceId) {
     return fail(res, 500, "Stripe não configurado.", {
       code: "STRIPE_NOT_CONFIGURED",
     });
@@ -13,14 +22,12 @@ export const createCheckoutSessionController = async (req, res) => {
 
   try {
     const requestOrigin =
-      req.headers.origin || FRONTEND_URL || "http://localhost:5173";
+      req.headers.origin || frontendUrl || "http://localhost:5173";
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
-      line_items: [
-        { price: STRIPE_PRICE_ID, quantity: req.body.quantity || 1 },
-      ],
+      line_items: [{ price: stripePriceId, quantity: req.body.quantity || 1 }],
       success_url: `${requestOrigin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${requestOrigin}/canceled`,
     });
@@ -32,6 +39,8 @@ export const createCheckoutSessionController = async (req, res) => {
 };
 
 export const getCheckoutSessionController = async (req, res) => {
+  const { stripe } = getStripeConfig();
+
   if (!stripe) {
     return fail(res, 500, "Stripe não configurado.", {
       code: "STRIPE_NOT_CONFIGURED",
