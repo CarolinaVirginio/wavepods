@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -7,7 +8,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { loginUser, registerUser } from "../api/auth";
 
 const fieldStyles = {
   "& .MuiOutlinedInput-root": {
@@ -35,6 +37,7 @@ const copyByMode = {
     alternateText: "Ainda não tem conta?",
     alternateLink: "/cadastro",
     alternateLabel: "Criar cadastro",
+    successMessage: "Login realizado com sucesso!",
   },
   register: {
     eyebrow: "Comece agora",
@@ -45,11 +48,75 @@ const copyByMode = {
     alternateText: "Já tem conta?",
     alternateLink: "/login",
     alternateLabel: "Fazer login",
+    successMessage: "Conta criada com sucesso!",
   },
 };
 
 function AuthPage({ mode = "login" }) {
+  const navigate = useNavigate();
   const content = copyByMode[mode];
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [status, setStatus] = useState({
+    loading: false,
+    error: "",
+    success: "",
+  });
+
+  useEffect(() => {
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+    });
+    setStatus({
+      loading: false,
+      error: "",
+      success: "",
+    });
+  }, [mode]);
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setFormData((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setStatus({ loading: true, error: "", success: "" });
+
+    try {
+      if (mode === "register") {
+        await registerUser(formData);
+      } else {
+        await loginUser({
+          email: formData.email,
+          password: formData.password,
+        });
+      }
+
+      setStatus({
+        loading: false,
+        error: "",
+        success: content.successMessage,
+      });
+
+      navigate("/minha-conta");
+    } catch (error) {
+      setStatus({
+        loading: false,
+        error: error.message,
+        success: "",
+      });
+    }
+  }
 
   return (
     <Box
@@ -72,7 +139,7 @@ function AuthPage({ mode = "login" }) {
             color: "#f4f7fb",
           }}
         >
-          <Stack spacing={3}>
+          <Stack spacing={3} component="form" onSubmit={handleSubmit}>
             <Box>
               <Typography
                 variant="overline"
@@ -92,6 +159,9 @@ function AuthPage({ mode = "login" }) {
               {mode === "register" && (
                 <TextField
                   label="Nome"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   variant="outlined"
                   fullWidth
                   InputLabelProps={{
@@ -102,6 +172,9 @@ function AuthPage({ mode = "login" }) {
               )}
               <TextField
                 label="Email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 type="email"
                 variant="outlined"
                 fullWidth
@@ -110,6 +183,9 @@ function AuthPage({ mode = "login" }) {
               />
               <TextField
                 label="Senha"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 type="password"
                 variant="outlined"
                 fullWidth
@@ -117,7 +193,9 @@ function AuthPage({ mode = "login" }) {
                 sx={fieldStyles}
               />
               <Button
+                type="submit"
                 variant="contained"
+                disabled={status.loading}
                 sx={{
                   py: 1.4,
                   borderRadius: 999,
@@ -125,9 +203,19 @@ function AuthPage({ mode = "login" }) {
                   background: "linear-gradient(90deg, #00bfff, #1e90ff)",
                 }}
               >
-                {content.primaryAction}
+                {status.loading ? "Enviando..." : content.primaryAction}
               </Button>
             </Stack>
+
+            {status.error ? (
+              <Typography sx={{ color: "#ff8a80" }}>{status.error}</Typography>
+            ) : null}
+
+            {status.success ? (
+              <Typography sx={{ color: "#8df5c2" }}>
+                {status.success}
+              </Typography>
+            ) : null}
 
             <Typography sx={{ color: "rgba(255,255,255,0.72)" }}>
               {content.alternateText}{" "}

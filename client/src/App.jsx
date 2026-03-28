@@ -9,6 +9,8 @@ import Footer from "./components/Footer";
 import Success from "./components/Success";
 import Canceled from "./components/Canceled";
 import AuthPage from "./components/AuthPage";
+import AccountPage from "./components/AccountPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function Home() {
   return (
@@ -30,6 +32,14 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/cadastro" element={<AuthPage mode="register" />} />
+        <Route
+          path="/minha-conta"
+          element={
+            <ProtectedRoute>
+              <AccountPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/success" element={<Success />} />
         <Route path="/canceled" element={<Canceled />} />
       </Routes>
