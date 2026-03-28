@@ -1,9 +1,11 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import emailRoutes from "./routes/emailRoutes.js";
 import newsletterRoutes from "./routes/newsletterRoutes.js";
 import checkoutRoutes from "./routes/checkoutRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import { fail } from "./utils/httpResponses.js";
 
 dotenv.config();
@@ -41,9 +43,11 @@ app.use(
 );
 
 app.use(express.json());
+app.use(cookieParser());
 app.use("/api", emailRoutes);
 app.use("/api", newsletterRoutes);
 app.use("/api", checkoutRoutes);
+app.use("/api", authRoutes);
 
 app.use((req, res) => {
   return fail(res, 404, "Rota não encontrada.", { code: "ROUTE_NOT_FOUND" });
